@@ -2,15 +2,26 @@ import os
 from PIL import Image
 import numpy as np
 import cv2
+import pickle
 
-yuz = cv2.CascadeClassifier('haarcascade-frontalface-default.xml ')
+
+yuz = cv2.CascadeClassifier('haarcascade-frontalface-default.xml')
+
+
 #temel klasör dosyalarımızın temelde nerede olduğunun bilgisini verir
 temel_klasor = os.path.dirname(os.path.abspath(__file__))
 resim_klasor=os.path.join(temel_klasor,"resimler")
 #resim klasör resimlerimizin nerede olduğunun bilgisini döndürür
+
+#recognizer = cv2.face.LBPHFaceRecognizer_create()
+recognizer = cv2.face.LBPHFaceRecognizer_create()
+
+#recognizer = cv2.createLBPHFaceRecognizer()
+#recognizer=cv2.face.EigenFaceRecognizer_create()
+#x= cv2.createLBHFaceRecognizer()
 y_labels=[]
 x_train=[]
-current_id=0;
+current_id=0
 label_ids={}
 
 for kok_dizin,dizin,dosyalar in os.walk(resim_klasor):
@@ -35,8 +46,11 @@ for kok_dizin,dizin,dosyalar in os.walk(resim_klasor):
              x_train.append(roi)
              y_labels.append(id)
 
+with open("etiket.pickle","wb") as f:
+    pickle.dump(label_ids,f)
 
-
+recognizer.train(x_train,np.array(y_labels))
+recognizer.save("trainner.yml")
 
 
 
