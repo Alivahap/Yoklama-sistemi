@@ -26,28 +26,33 @@ label_ids={}
 
 for kok_dizin,dizin,dosyalar in os.walk(resim_klasor):
  for dosya in dosyalar:
-     if dosya.endswith("png") or dosya.endswith("jpg"):
+
+     if dosya.endswith("png") or dosya.endswith("jpg") or dosya.endswith("jpeg"):
 
          path = os.path.join(kok_dizin,dosya)
          label=os.path.basename(os.path.dirname(path).replace(" ","-")).lower()
          #print(label,path)
+      #   y_labels.append(label)
+       #  x_train.append(path)
          if not label in label_ids:
              label_ids[label]=current_id
              current_id+=1
-             print(label_ids)
 
-         id=label_ids[label]
+         id = label_ids[label]
+         print(label_ids)
+
 
          pil_resim=Image.open(path).convert("L")
          resim_array = np.array(pil_resim, "uint8")
-         yuzler = yuz.detectMultiScale(resim_array, 1.3, 4)
+
+         yuzler = yuz.detectMultiScale(resim_array, 1.5, 5)
          for(x,y,w,h) in yuzler:
              roi=resim_array[y:y+h,x:x+w]
              x_train.append(roi)
              y_labels.append(id)
 
-with open("etiket.pickle","wb") as f:
-    pickle.dump(label_ids,f)
+with open("etiket.pickle", 'wb') as f:
+    pickle.dump(label_ids, f)
 
 recognizer.train(x_train,np.array(y_labels))
 recognizer.save("trainner.yml")
